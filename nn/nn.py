@@ -20,24 +20,24 @@ class Network:
             for neuron in layer.neurons:
                 neuron.d = 0
         
-    def prop(self, inputs):
+    def prop(self, input):
         for i, neuron in enumerate(self.layers[0].neurons):
-            neuron.value = inputs[i]
+            neuron.value = input[i]
         return [neuron.val() for neuron in self.layers[-1].neurons]
     
-    def backprop(self, outputs):
+    def backprop(self, output):
         self.clear_deriv()
         for layer in reversed(self.layers[1:]):
             for neuron in layer.neurons:
                 if layer.is_last():
-                    neuron.d = 2 * (neuron.value - outputs[neuron.index])
+                    neuron.d = 2 * (neuron.value - output[neuron.index])
                 neuron.d *= sigd(neuron.value)
                 neuron.bias -= neuron.d * self.lr
                 for w in range(len(neuron.weights)):
                     prev_neuron = layer.prev().neurons[w]
                     neuron.weights[w] -= neuron.d * prev_neuron.value * self.lr
                     prev_neuron.d += neuron.d * neuron.weights[w]
-        return sum((neuron.value - outputs[neuron.index])**2 for neuron in self.layers[-1].neurons)
+        return sum((neuron.value - output[neuron.index])**2 for neuron in self.layers[-1].neurons)
 
 
 class Layer:
